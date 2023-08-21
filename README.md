@@ -1,2 +1,2 @@
-# Baekjoon_OnlineJudge
+# Algorithm_Study
 Algorithm for Python
