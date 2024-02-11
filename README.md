@@ -1,2 +1,2 @@
-# Algorithm_Python
-Algorithm for Python
+# Algorithm_study
+with Python, Java
