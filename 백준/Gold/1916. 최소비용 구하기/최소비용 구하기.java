@@ -23,7 +23,9 @@ class Node implements Comparable<Node> {
 public class Main {
 	static int N, M;
 	static ArrayList<ArrayList<Node>> graph;
+	static boolean[] visit;
 	static int start, end, answer;
+	static int[] hist;	// 경로에 포함된 도시 저장
 	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -57,7 +59,7 @@ public class Main {
 	
 	static int search(int start, int end, ArrayList<ArrayList<Node>> graph, int size) {
 		PriorityQueue<Node> pq = new PriorityQueue<>();
-		boolean[] visit = new boolean[size+1];
+		visit = new boolean[size+1];
 		
 		pq.add(new Node(start, 0));	// 시작 도시 저장
 		
