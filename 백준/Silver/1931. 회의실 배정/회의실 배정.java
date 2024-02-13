@@ -1,7 +1,10 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main {
 	
@@ -25,14 +28,15 @@ public class Main {
 		
 	}
 	
-	public static void main(String[] args) {
-		
-		Scanner sc = new Scanner(System.in);
-		int N = sc.nextInt();
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int N = Integer.parseInt(br.readLine());
 		Meeting[] meetings = new Meeting[N];	// 회의 개수 만큼 배열 생성
 		
+		StringTokenizer st;
 		for (int i=0; i<N; i++) {
-			meetings[i] = new Meeting(sc.nextInt(), sc.nextInt());
+			st = new StringTokenizer(br.readLine());
+			meetings[i] = new Meeting(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
 		}
 		
 		Arrays.sort(meetings);
