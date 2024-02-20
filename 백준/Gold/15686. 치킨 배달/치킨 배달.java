@@ -46,7 +46,7 @@ public class Main {
 		pick = new Point[M];	// 픽한 치킨집을 담을 배열
 		dfs(0, 0);
 		
-		System.out.println(answer);
+		System.out.print(answer);
 		br.close();
 	}
 	
@@ -62,7 +62,7 @@ public class Main {
 				sum += tmp;
 			}
 			
-			if (answer>sum)	answer = sum;
+			answer = Math.min(answer, sum);
 			return;
 		}
 		
