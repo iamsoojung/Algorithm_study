@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
 
 public class Solution {
 	
-	static int N, maxCore, minWire;
+	static int N, maxCore, minWire, size;
 	static int[][] map;
 	static ArrayList<int []> coreList;
 	static int[] dx = {-1, 0, 1, 0};
@@ -22,14 +22,15 @@ public class Solution {
 			
 			map = new int[N][N];
 			coreList = new ArrayList<>();
+			size = 0;
 			for (int i=0; i<N; i++) {
 				st = new StringTokenizer(br.readLine());
 				for (int j=0; j<N; j++) {
 					map[i][j] = Integer.parseInt(st.nextToken());
 					
-					if (0==i || i==N-1 || 0==j || j==N-1)	continue;
-					if (map[i][j] == 1) {
+					if (0<i && i<N-1 && 0<j && j<N-1 && map[i][j] == 1) {
 						coreList.add(new int[] {i, j});
+						size++;
 					}
 				}
 			}
@@ -44,7 +45,11 @@ public class Solution {
 	}
 	
 	static void dfs(int idx, int coreCnt, int wireCnt) {
-		if (idx == coreList.size()) {
+		
+		// 현재 + 나머지 < max => 가지치기
+		if (coreCnt + (size-idx) < maxCore)	return;
+		
+		if (idx == size) {
 			if (maxCore < coreCnt) {
 				maxCore = coreCnt;
 				minWire = wireCnt;
@@ -54,8 +59,9 @@ public class Solution {
 			return;
 		}
 		
-		int cx = coreList.get(idx)[0];
-		int cy = coreList.get(idx)[1];
+		int[] cur = coreList.get(idx);
+		int cx = cur[0];
+		int cy = cur[1];
 		
 		for (int d=0; d<4; d++) {
 			int nx=cx;
