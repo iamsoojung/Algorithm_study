@@ -1,31 +1,27 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main {
-	static int N; //입력받은 수
-	static int res = Integer.MAX_VALUE;
-	static int[] dp;
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		N = sc.nextInt();
-		dp = new int[N + 1];
-		
-		dp[1] = 0; // 기저값 입력
-
-		for(int i = 2; i <= N; i++) {
-			
-			//1을 뺀다.
-			dp[i] = dp[i-1] + 1;
-			//X가 3으로 나누어 떨어지면, 3으로 나눈다.
-			if(i % 3 == 0) {
-				dp[i] = Math.min(dp[i], dp[i/3]+1); 
-			}
-			//X가 2로 나누어 떨어지면, 2로 나눈다.
-			if(i % 2 == 0) {
-				dp[i] = Math.min(dp[i], dp[i/2]+1); 
-			}
-		}
-
-		System.out.println(dp[N]);
-	}
+    static int N;
+    static int[] dp;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        N = Integer.parseInt(br.readLine());
+        dp = new int[N+1];
+        
+        dp[1] = 0;
+        for (int i=2; i<=N; i++) {
+        	dp[i] = dp[i-1] + 1;	// 빼기 1 연산
+        	
+        	if (i%3 == 0) {	// 나누기 3 연산
+        		dp[i] = Math.min(dp[i], dp[i/3] + 1);
+        	}
+        	if (i%2 == 0) {	// 나누기 2 연산
+        		dp[i] = Math.min(dp[i], dp[i/2] + 1);
+        	}
+        }
+        System.out.print(dp[N]);
+    }
 }
- 
