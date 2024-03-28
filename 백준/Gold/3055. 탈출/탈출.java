@@ -78,14 +78,16 @@ public class Main {
 		
 	}
 
-	// . 빈곳 / * 물차있는지역 / X 돌 / D 비버의 굴(시작점) / S 고슴도치 위치(도착점)
+	// . 빈곳 / * 물차있는지역 / X 돌 / D 비버의 굴(도착점) / S 고슴도치 위치(시작점)
 	static void bfs() {
 		while(!gq.isEmpty()) {
+			
+			water();	// 물 퍼뜨리기
+			
+			// -------- 고슴도치 움직이기
 			int size = gq.size();
-			// 물 퍼트리기
-			water();
+			
 			for (int i=0; i<size; i++) {
-				
 				Node cur = gq.poll();
 				int cx = cur.r;
 				int cy = cur.c;
@@ -106,7 +108,7 @@ public class Main {
 					gq.add(new Node(nx, ny, cur.cnt+1));
 					visit[nx][ny] = DD;
 				}
-			} 
+			}
 		}
 	}
 	
