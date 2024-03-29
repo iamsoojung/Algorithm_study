@@ -1,137 +1,132 @@
-
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.StringTokenizer;
 
 public class Main {
+	
+	static class Node {
+		int r, c;
+		
+		public Node(int r, int c) {
+			this.r = r;
+			this.c = c;
+		}
+	}
+	
+	static int R, C, answer=0;
+	static int eR, eC;
+	static char[][] map;
+	static boolean[][] visitWater, visitSwan;
+	static Queue<Node> waterQ = new ArrayDeque<>();
+	static Queue<Node> swanQ = new ArrayDeque<>();
+	static int[] dx = {-1, 0, 1, 0};
+	static int[] dy = {0, 1, 0, -1};
+	
+	// '.'은 물 공간, 'X'는 빙판 공간, 'L'은 백조가 있는 공간
+	// 물과 접촉한 빙판은 녹음
+	// 며칠이 지나야 백조들이 만날 수 있는지?
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		R = Integer.parseInt(st.nextToken());
+		C = Integer.parseInt(st.nextToken());
+		map = new char[R][C];
+		visitWater = new boolean[R][C];
+		visitSwan = new boolean[R][C];
+		
+		String s;
+		for (int i=0; i<R; i++) {
+			s = br.readLine();
+			for (int j=0; j<C; j++) {
+				map[i][j] = s.charAt(j);
+				
+				if (map[i][j] == '.') {
+					waterQ.add(new Node(i, j));
+					visitWater[i][j] = true;
+				}				
+				else if (map[i][j] == 'L') {
+					waterQ.add(new Node(i, j));
+					if (swanQ.isEmpty()) {
+						swanQ.add(new Node(i, j));
+						visitSwan[i][j] = true;
+                        map[i][j] = '.';
+					} else {
+						eR = i;
+						eC = j;
+                        map[i][j] = '.';
+					}
+				}
+			}
+		}
+		
+		melt();
+//		checkMeet();
+		
+		System.out.println(answer);
+		
+	}
+	
+	static void melt() {
+		while(!swanQ.isEmpty()) {	// 더 녹일 수 없을 때까지
+			
+			// 얼음 녹이기
+			int size = waterQ.size();
+			for (int i=0; i<size; i++) {
+				Node cur = waterQ.poll();
+				int cx = cur.r;
+				int cy = cur.c;
+				
+				for (int d=0; d<4; d++) {
+					int nx = cx + dx[d];
+					int ny = cy + dy[d];
+					
+					if (0>nx || nx>=R || 0>ny || ny>=C || visitWater[nx][ny])	continue;
+					if (map[nx][ny] != 'X')	continue;
+						
+					map[nx][ny] = '.';
+					waterQ.add(new Node(nx, ny));
+					visitWater[nx][ny] = true;
+				}
+			}
+			answer++;
+			
+			// 백조 만나는지 확인
+			if (checkMeet())	return;
+		}
+	}
+	static boolean checkMeet() {
+		Queue<Node> tmpQ = new ArrayDeque<>();
+		
+		while(!swanQ.isEmpty()) {
+			Node cur = swanQ.poll();
+			int cx = cur.r;
+			int cy = cur.c;
+			
+			for (int d=0; d<4; d++) {
+				int nx = cx + dx[d];
+				int ny = cy + dy[d];
+				
+				if (0>nx || nx>=R || 0>ny || ny>=C || visitSwan[nx][ny])	continue;
+				
+				if (map[nx][ny] == 'X') {
+					tmpQ.add(new Node(nx, ny));
+					visitSwan[nx][ny] = true;
+					continue;
+				}
 
-    static int r, c;
-    static char[][] arr;
+				if (nx == eR && ny == eC) {
+					return true; 
+				}
 
-    static boolean[][] visit;
-    static boolean chk;
-    static int[][] swan;
-    static Queue<int[]> mainQ ;
-    static Queue<int[]> iceQ;
-
-    public static void main(String[] args) throws NumberFormatException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-
-        st = new StringTokenizer(br.readLine());
-
-        r = Integer.parseInt(st.nextToken());
-        c = Integer.parseInt(st.nextToken());
-
-        arr = new char[r][c];
-        visit = new boolean[r][c];
-        swan = new int[2][2];
-        mainQ = new LinkedList<>();
-        iceQ = new LinkedList<>();
-        String str;
-
-        int sw = 0;
-        for (int i = 0; i < r; i++) {
-            st = new StringTokenizer(br.readLine());
-            str = st.nextToken();
-            for (int j = 0; j < c; j++) {
-                char c = str.charAt(j);
-                arr[i][j] = c;
-                if (c == 'L') {
-                    swan[sw][0] = i;
-                    swan[sw][1] = j;
-                    sw++;
-                    iceQ.offer(new int[] {i,j});
-
-                } else if(c== '.') {
-                    iceQ.offer(new int[] {i,j});
-                }
-
-            }
-        }
-
-        mainQ.offer(new int[] {swan[0][0],swan[0][1]});
-        visit[swan[0][0]][swan[0][1]] = true;
-
-        int day = 0;
-
-        while (true) {
-
-            chk = false;
-            bfs();
-            if (chk) {
-                System.out.println(day);
-                return;
-            } else {
-                day++;
-            }
-
-        }
-
-
-    }
-    public static void melt() {
-        Queue<int[]> q = new LinkedList<>();
-
-        while(!iceQ.isEmpty()) {
-            int[] out = iceQ.poll();
-            int x = out[0];
-            int y = out[1];
-
-            for (int i = 0; i < 4; i++) {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-
-                if (nx >= 0 && nx < r && ny >= 0 && ny < c) {
-                    if (arr[nx][ny] == 'X') {
-                        arr[nx][ny] = '.';
-                        q.offer(new int[]{nx, ny});
-                    }
-                }
-            }
-        }
-        iceQ = q;
-    }
-    public static void bfs() {
-        Queue<int[]> q = new LinkedList<>();
-
-        while (!mainQ.isEmpty()) {
-            int[] out = mainQ.poll();
-            int x = out[0];
-            int y = out[1];
-
-            for (int i = 0; i < 4; i++) {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-
-                if (nx >= 0 && nx < r && ny >= 0 && ny < c && !visit[nx][ny]) {
-                    if(nx == swan[1][0] && ny == swan[1][1] ) {
-                        chk = true;
-                        return;
-                    }
-                    if (arr[nx][ny] == 'X') {
-                        visit[nx][ny] = true;
-                        q.offer(new int[]{nx, ny});
-                    }
-                    else {
-                        visit[nx][ny] = true;
-                        mainQ.offer(new int[]{nx, ny});
-                    }
-
-                }
-            }
-        }
-
-        if(!chk) {
-            melt();
-        }
-
-        mainQ = q;
-    }
+				visitSwan[nx][ny] = true;
+				swanQ.add(new Node(nx, ny));
+			}
+		}
+		swanQ = tmpQ;
+		return false;
+	}
 }
-
-
-
-
