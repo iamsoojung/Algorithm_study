@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
@@ -23,7 +24,7 @@ public class Solution {
 	
 	static int N, answer;
 	static int[][] map;
-	static boolean[][] visit;
+	static int[][] dist;
 	static int[] dx = {-1, 0, 1, 0};
 	static int[] dy = {0, 1, 0, -1};
 
@@ -51,9 +52,14 @@ public class Solution {
 //				}System.out.println();
 //			}
 			
-			visit = new boolean[N][N];
-			answer = Integer.MAX_VALUE;
-			bfs();
+			dist = new int[N][N];
+			for (int i=0; i<N; i++) {
+				Arrays.fill(dist[i], Integer.MAX_VALUE);
+			}
+			
+			dijkstra();
+			
+			answer = dist[N-1][N-1];
 			
 			sb.append("#").append(testCase).append(" ").append(answer).append("\n");	// ~~~
 		}
@@ -64,33 +70,26 @@ public class Solution {
 		return 0<=x && x<N && 0<=y && y<N;
 	}
 	
-	static void bfs() {
+	static void dijkstra() {
 		PriorityQueue<Node> pq = new PriorityQueue<>();
-		pq.offer(new Node(0, 0, 0));	// (0,0) 에서 시작
-		visit[0][0] = true;
+		pq.offer(new Node(0, 0, map[0][0]));	// (0,0) 에서 시작
+		dist[0][0] = map[0][0];
 		
 		while(!pq.isEmpty()) {
 			Node cur = pq.poll();
 			int cx = cur.x;
 			int cy = cur.y;
 			
-			if (cx == N-1 && cy == N-1) {
-//				answer = Math.min(answer, cur.cnt);		// 처음에 딱 찾으면 bfs가 바로 종료해버리나?
-				answer = cur.cnt;
-				return;
-			}
-			
 			for (int d=0; d<4; d++) {
 				int nx = cx + dx[d];
 				int ny = cy + dy[d];
 				
 				if (!inRange(nx, ny))	continue;		// 범위 체크
-				if (visit[nx][ny])		continue;		// 방문 체크
 				
-				int dist = map[nx][ny];
-				
-				pq.offer(new Node(nx, ny, cur.cnt + dist));
-				visit[nx][ny] = true;
+				if (dist[nx][ny] > dist[cx][cy] + map[nx][ny]) {	// 직빵 > 우회
+					dist[nx][ny] = dist[cx][cy] + map[nx][ny];
+					pq.offer(new Node(nx, ny, dist[nx][ny]));
+				}
 			}
 		}
 	}
