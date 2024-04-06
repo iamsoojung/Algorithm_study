@@ -60,75 +60,69 @@ public class Solution {
         int cy = start.y;
         
         while (true) {
-            int cNum = map[cx][cy];
+            cx += dx[d];    // 전진
+            cy += dy[d];
             
-            // 여기가 블록?
-            if (1 <= cNum && cNum <= 5) {
-                switch (cNum) {
-                case 1:
-                    if (d == 2 || d == 3) {    // 경사면
-                        d = (d == 2) ? 1 : 0;
-                    } else {    // 수평면
-                        d = (d == 0) ? 2 : 3;
-                    }
-                    break;
-                case 2:
-                    if (d == 0 || d == 3) {
-                        d = (d == 0) ? 1 : 2;
-                    } else {
-                        d = (d == 1) ? 3 : 0;
-                    }
-                    break;
-                case 3:
-                    if (d == 0 || d == 1) {
-                        d = (d == 0) ? 3 : 2;
-                    } else {
-                        d = (d == 2) ? 0 : 1;
-                    }
-                    break;
-                case 4:
-                    if (d == 1 || d == 2) {
-                        d = (d == 1) ? 0 : 3;
-                    } else {
-                        d = (d == 0) ? 2 : 1;
-                    }
-                    break;
-                case 5:
-                    d = (d + 2) % 4;
-                    break;
-                }
-                cnt++;
-            }
-            
-            int nx = cx + dx[d];    // 전진
-            int ny = cy + dy[d];
-            
-            // 갔는데 벽?
-            if (0 > nx || nx >= N || 0 > ny || ny >= N) {
-                d = (d + 2) % 4;    // 방향은 반대
-                nx = cx;    // 위치는 그대로
-                ny = cy;
-                cnt++;
-            }
-
-            // 갔는데 웜홀?
-            if (map[nx][ny] >= 6) {
-                int n = map[nx][ny];
-                for (int i = 0; i < 2; i++) {    // 페어 찾기
-                    if (wormList[n].get(i).x == nx && wormList[n].get(i).y == ny) {
-                        nx = (i == 0) ? wormList[n].get(1).x : wormList[n].get(0).x;
-                        ny = (i == 1) ? wormList[n].get(0).y : wormList[n].get(1).y;
-                        break;
-                    }
-                }
+            // 벽
+            if (0 > cx || cx >= N || 0 > cy || cy >= N) {
+            	d = (d + 2) % 4;    // 방향 반대
+            	cnt++;
+            	continue;
             }
             
             // 종료 조건 (출발위치 or 블랙홀)
-            if ((nx == start.x && ny == start.y) || map[nx][ny] == -1)    break;
+            if ((cx == start.x && cy == start.y) || map[cx][cy] == -1)    break;
             
-            // 다음 준비 (다음이 현재로)
-            cx = nx;
-            cy = ny;
+            // 블록
+            switch (map[cx][cy]) {
+            case 1:
+                if (d == 2 || d == 3) {    // 경사면
+                    d = (d == 2) ? 1 : 0;
+                } else {    // 수평면
+                    d = (d == 0) ? 2 : 3;
+                }
+                cnt++;
+                break;
+            case 2:
+                if (d == 0 || d == 3) {
+                    d = (d == 0) ? 1 : 2;
+                } else {
+                    d = (d == 1) ? 3 : 0;
+                }
+                cnt++;
+                break;
+            case 3:
+                if (d == 0 || d == 1) {
+                    d = (d == 0) ? 3 : 2;
+                } else {
+                    d = (d == 2) ? 0 : 1;
+                }
+                cnt++;
+                break;
+            case 4:
+                if (d == 1 || d == 2) {
+                    d = (d == 1) ? 0 : 3;
+                } else {
+                    d = (d == 0) ? 2 : 1;
+                }
+                cnt++;
+                break;
+            case 5:
+                d = (d + 2) % 4;
+                cnt++;
+                break;
+            // 웜홀
+            case 6: case 7: case 8: case 9: case 10:
+            	int n = map[cx][cy];
+            	if (wormList[n].get(0).x == cx && wormList[n].get(0).y == cy) {	// 페어 찾기
+                    cx = wormList[n].get(1).x;
+                    cy = wormList[n].get(1).y;
+                } else {
+                	cx = wormList[n].get(0).x;
+                    cy = wormList[n].get(0).y;
+                }
+            	break;
+            }
         }
         return cnt;
     }
