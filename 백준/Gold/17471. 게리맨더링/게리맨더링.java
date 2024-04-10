@@ -1,101 +1,120 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class Main {	
+public class Main {
 	
-	static int N;
-	static int min = Integer.MAX_VALUE;
-	static int[] people;
-	static ArrayList<Integer>[] adjList;
-	static boolean[] visit;
-	static int[] part;	// 선거구 (0 or 1)
-	
+	static int num1, num2, sum1, sum2;
+	static int N, answer;		// 구역의 개수
+	static int[] person;	// 각 구역의 인구 수
+	static boolean[] visit;		
+	static ArrayList<Integer>[] arr;	// 구역 인접 리스트
+	static boolean[] areaCheck;	// 어느 선거구로 나누어졌는지 체크
+
 	public static void main(String[] args) throws IOException {
+		
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = null;
+		StringBuilder sb = new StringBuilder();
 		
-		N = Integer.parseInt(br.readLine());	// 구역의 개수
+		N = Integer.parseInt(br.readLine());
 		
-		people = new int[N+1];	// 구역의 인구수
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-		for (int i=1; i<=N; i++) {
-			people[i] = Integer.parseInt(st.nextToken());
+		person = new int[N+1];
+		st = new StringTokenizer(br.readLine());
+		for (int i=1; i<N+1; i++) {
+			person[i] = Integer.parseInt(st.nextToken());
 		}
 		
-		adjList = new ArrayList[N+1];
-		for (int i=0; i<=N; i++) {
-			adjList[i] = new ArrayList<>();
+		arr = new ArrayList[N+1];
+		for (int i=0; i<N+1; i++) {
+			arr[i] = new ArrayList<>();
 		}
-		for (int i=1; i<=N; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
-			int cnt = Integer.parseInt(st.nextToken());
-			for (int j=0; j<cnt; j++) {
-				adjList[i].add(Integer.parseInt(st.nextToken()));
+		int size = 0;
+		for (int i=1; i<N+1; i++) {
+			st = new StringTokenizer(br.readLine());
+			size = Integer.parseInt(st.nextToken());
+			for (int j=0; j<size; j++) {
+				arr[i].add(Integer.parseInt(st.nextToken()));
 			}
 		}
 		
-		part = new int[N+1];	// 나눠진 구역번호 저장
-		dfs(1);
+		areaCheck = new boolean[N+1];
+		answer = Integer.MAX_VALUE;
+		dfs(1);	// 1번 구역부터
+	
+//		for (int i=0; i<N+1; i++) {
+//			System.out.println(arr[i].toString());
+//		}
 		
-		if (min == Integer.MAX_VALUE) {
-			System.out.print(-1);
+		if (answer == Integer.MAX_VALUE) {
+			System.out.println(-1);
 		} else {
-			System.out.print(min);
-		}	
+			System.out.println(answer);			
+		}
 	}
 	
-	static void dfs(int depth) {
-		if (depth == N+1) {
-			int sum1 =0, sum0 = 0;
+	// 선거구 2개로 나누기
+	static void dfs(int cnt) {
+		if (cnt == N) {
+			num1=0; num2=0;	// 두 선거구에 포함된 구역 수
+			sum1=0; sum2=0;	// 두 선거구에 포함된 인구 수
 			for (int i=1; i<N+1; i++) {
-				if (part[i] == 1) {
-					sum1 += people[i];
-				} else {
-					sum0 += people[i];
+				if (areaCheck[i]) {
+					num1++;
+					sum1 += person[i];
+				}
+				else {
+					num2++;
+					sum2 += person[i];
+				}
+			}
+			if (num1 == 0 || num2 == 0)	return;	// 구역을 적어도 하나 포함해야 함
+
+			visit = new boolean[N+1];
+//			for (int i=1; i<N+1; i++) {
+//				System.out.print(visit[i] == true ? 'T' : 'F');
+//			}System.out.println();
+			
+			// 구역 인접되어있는지 확인
+			int result = 0;
+			for (int i=1; i<N+1; i++) {
+				if (!visit[i]) {
+					checkConnect(i, areaCheck[i]);
+					result++;
 				}
 			}
 			
-			visit = new boolean[N+1];
-			int cnt=0;	// 결과적으로 나온 구역 수 (2가 나와야 두 선거구로 나눠진 것)
-			for (int i=1; i<N+1; i++) {
-				if (!visit[i]) {
-					bfs(i, part[i]);
-					cnt++;
-				}
+			if (result == 2) {
+				answer = Math.min(answer, Math.abs(sum1 - sum2));
 			}
-			if (cnt == 2) {
-				min = Math.min(min, Math.abs(sum1-sum0));
-			}
+			
 			return;
 		}
 		
-		// 1선거구 or 0선거구 => 2가지 경우
-		part[depth] = 1;
-		dfs(depth+1);
-		
-		part[depth] = 0;
-		dfs(depth+1);
+		areaCheck[cnt] = true;
+		dfs(cnt+1);
+		areaCheck[cnt] = false;
+		dfs(cnt+1);
 	}
 	
-	static void bfs(int idx, int partNum) {
-		Queue<Integer> q = new LinkedList<Integer>();
-		q.offer(idx);
-		visit[idx] = true;
+	static void checkConnect(int start, boolean check) {
+		Queue<Integer> q = new ArrayDeque<>();
+		q.add(start);
+		visit[start] = true;
 		
 		while(!q.isEmpty()) {
 			int cur = q.poll();
 			
-			for (int next : adjList[cur]) {
-				if (part[next] == partNum && !visit[next]) {
-					q.offer(next);
+			for (int next : arr[cur]) {
+				if (areaCheck[next] == check && !visit[next]) {
+					q.add(next);
 					visit[next] = true;
 				}
 			}
 		}
 	}
-
 }
