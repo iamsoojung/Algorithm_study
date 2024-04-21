@@ -51,13 +51,12 @@ public class Main {
 		}
 		
 		visit = new boolean[N][M][2];
-		answer = Integer.MAX_VALUE;
-		bfs();
-		
-		System.out.print(answer == Integer.MAX_VALUE ? -1 : answer);
+		answer = bfs();
+
+		System.out.print(answer);
 	}
 	
-	static void bfs() {
+	static int bfs() {
 		Queue<Node> q = new ArrayDeque<>();
 		q.add(new Node(startX, startY, 0, 0));
 		visit[startX][startY][0] = true;
@@ -68,7 +67,7 @@ public class Main {
 			int cy = cur.y;
 
 			if (cx == endX && cy == endY) {
-				answer = Math.min(answer, cur.dist);
+				return cur.dist;
 			}
 			
 			for (int d=0; d<4; d++) {
@@ -86,7 +85,7 @@ public class Main {
 				}
 			}
 		}
-		return;
+		return -1;
 	}
 	
 	static boolean inRange(int x, int y) {
