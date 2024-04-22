@@ -34,8 +34,6 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = null;
-		StringBuilder sb = new StringBuilder();
 
 		N = Integer.parseInt(br.readLine());
 		map = new char[N][N];
@@ -130,18 +128,6 @@ public class Main {
 			}
 		}
 		return true;
-	}
-
-	static void recover(int x, int y, int pos, char ch) {
-		if (pos == 0) {
-			map[x][y - 1] = ch;
-			map[x][y] = ch;
-			map[x][y + 1] = ch;
-		} else {
-			map[x - 1][y] = ch;
-			map[x][y] = ch;
-			map[x + 1][y] = ch;
-		}
 	}
 
 	static boolean goOK(int x, int y, int pos) {
