@@ -8,10 +8,8 @@ import java.util.StringTokenizer;
 
 public class Solution {
 
-	static int N, M, C, resultA, resultB, answer;
+	static int N, M, C, score, answer;
 	static int[][] map;
-	static boolean[][] selected;
-	static boolean[] visit;
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -33,75 +31,39 @@ public class Solution {
 				}
 			}
 
-			selected = new boolean[N][N];
-			visit = new boolean[M];
-			resultA = 0;	resultB = 0;
 			answer = 0;
-			comb();
+			comb(0, 0, 0);
 			
 			sb.append("#").append(testCase).append(" ").append(answer).append("\n");
 		}
 		System.out.print(sb.toString());
 	}
 
-	static void comb() {
-
-		// 1번 벌통 고르기
-		for (int i=0; i<N; i++) {
-			for (int j=0; j<=N-M; j++) {
-				for (int k=j; k<j+M; k++) {
-					selected[i][k] = true;
-				}
-				
-				// 2번 벌통 고르기
-				for (int a=0; a<N; a++) {
-					for (int b=0; b<=N-M; b++) {
-						
-						boolean flag = true;
-						for (int c=0; c<M; c++) {	// 겹치면 꺼졍
-							if (selected[a][b+c]) {
-								flag = false;
-								break;
-							}
-						}
-						if(!flag)	continue;
-						
-						subset(0, i, j, a, b);	// 점수 구하기
-						answer = Math.max(answer, resultA + resultB);
-						resultA = 0;	resultB = 0;
-					}
-				}
-
-				for (int k=j; k<j+M; k++) {	// 백트래킹
-					selected[i][k] = false;
-				}
+	static void comb(int cnt, int start, int sum) {
+		if (cnt == 2) {		// 두명꺼 다 구했다면
+			answer = Math.max(answer, sum);
+			return;
+		}
+		
+		for (int i=start; i<N*N; i++) {
+			int x = i/N;
+			int y = i%N;
+			
+			if (y+M <= N) {	// 열이 크기 초과하지 않았을 때
+				score = 0;
+				subset(0, x, y, 0, 0);
+				comb(cnt + 1, i + M, sum + score);
 			}
 		}
 	}
 	
-	static void subset(int cnt, int i, int j, int a, int b) {
-		if (cnt == M) {
-			int score1=0, score2=0, weight1=0, weight2=0;
-			for (int z=0; z<M; z++) {
-				if (visit[z]) {
-					score1 += map[i][j+z] * map[i][j+z];
-					weight1 += map[i][j+z];
-					score2 += map[a][b+z] * map[a][b+z];
-					weight2 += map[a][b+z];
-				}
-			}
-			if (weight1 <= C) {
-				resultA = Math.max(resultA, score1);
-			}
-			if (weight2 <= C) {
-				resultB = Math.max(resultB, score2);
-			}
+	static void subset(int cnt, int x, int y, int weightSum, int scoreSum) {
+		if (weightSum > C) 	return;
+		if (cnt == M) {	// M개벌통 부분집합 다 한 경우
+			score = Math.max(score, scoreSum);
 			return;
 		}
-		
-		visit[cnt] = true;
-		subset(cnt+1, i, j, a, b);
-		visit[cnt] = false;
-		subset(cnt+1, i, j, a, b);
+		subset(cnt+1, x, y, weightSum + map[x][y+cnt], scoreSum + map[x][y+cnt]*map[x][y+cnt]);
+		subset(cnt+1, x, y, weightSum, scoreSum);		
 	}
 }
