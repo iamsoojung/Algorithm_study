@@ -7,34 +7,34 @@ import java.util.StringTokenizer;
 
 public class Main {
 	
-	static class Node implements Comparable<Node> {
-		int x, y, w;
+	public static class Node implements Comparable<Node>{
+		int x, y, dist;
 
-		public Node(int x, int y, int w) {
+		public Node(int x, int y, int dist) {
 			super();
 			this.x = x;
 			this.y = y;
-			this.w = w;
+			this.dist = dist;
 		}
 
 		@Override
-		public int compareTo(Main.Node o) {
-			return Integer.compare(this.w, o.w);
+		public int compareTo(Node o) {
+			return this.dist - o.dist;
 		}
 	}
 	
-	static int N, answer=0, tc=1;
+	static int N, answer, tc=1;
 	static int[][] map;
 	static int[][] dist;
 	static int[] dx = {-1, 0, 1, 0};
 	static int[] dy = {0, 1, 0, -1};
-	
-	public static void main (String[] args) throws IOException {
+
+	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
+		StringTokenizer st = null;
 		StringBuilder sb = new StringBuilder();
 		
-		while (true) {
+		while(true) {
 			N = Integer.parseInt(br.readLine());
 			if (N == 0)	break;
 			
@@ -61,29 +61,32 @@ public class Main {
 	}
 	
 	static void dijkstra() {
-		PriorityQueue<Node> pq = new PriorityQueue<Node>();
-		dist[0][0] = map[0][0];	// 시작 정점 비용 적용
-		pq.offer(new Node(0, 0, map[0][0]));
+		PriorityQueue<Node> pq = new PriorityQueue<>();
+		pq.add(new Node(0, 0, 0));
+		dist[0][0] = map[0][0];
 		
 		while(!pq.isEmpty()) {
 			Node cur = pq.poll();
 			int cx = cur.x;
 			int cy = cur.y;
-			int cw = cur.w;
 			
-			if (dist[cx][cy] < cw)	continue;	// 가봤자 최소가 나올 수 없음
+			if (dist[cx][cy] < cur.dist)	continue;	// 이미갱신되어있는비용 < 현재보는비용
 			
 			for (int d=0; d<4; d++) {
 				int nx = cx + dx[d];
 				int ny = cy + dy[d];
 				
-				if (0 > nx || nx >= N || 0 > ny || ny >= N)	continue;
+				if (!inRange(nx, ny))	continue;
 				
-				if (dist[nx][ny] > dist[cx][cy] + map[nx][ny]) {	// 직빵 > 우회
+				if (dist[nx][ny] > dist[cx][cy] + map[nx][ny]) {
 					dist[nx][ny] = dist[cx][cy] + map[nx][ny];
 					pq.offer(new Node(nx, ny, dist[nx][ny]));
-				} 
+				}
 			}
 		}
+	}
+	
+	static boolean inRange(int x, int y) {
+		return 0<=x && x<N && 0<=y && y<N;
 	}
 }
