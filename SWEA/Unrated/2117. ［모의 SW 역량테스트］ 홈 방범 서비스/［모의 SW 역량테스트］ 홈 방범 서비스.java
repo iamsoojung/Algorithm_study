@@ -1,26 +1,13 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Solution {
 	
-	static class Node {
-		int x, y;
-
-		public Node(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
-	
 	static int N, M, K, answer;
+	static boolean flag;
 	static int[][] map;
-	static boolean[][] visit;
-	static int[] dx = {-1, 0, 1, 0};
-	static int[] dy = {0, 1, 0, -1};
 	
 	public static void main(String[] args) throws IOException{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -42,52 +29,48 @@ public class Solution {
 			}
 			
 			answer = 0;
-			for (int i=0; i<N; i++) {
-				for (int j=0; j<N; j++) {
-					visit = new boolean[N][N];
-					bfs(i, j);
+			flag = false;
+			K = (N%2 == 0) ? N+1 : N;	// 도시크기가 짝수라면 마름모라서 N+1 해야함 
+			
+			for (int k=K; k>0; k--) {
+				int cost = k*k + (k-1)*(k-1);	// 운영 비용
+				int dist = k-1;
+				
+				for (int i=0; i<N; i++) {
+					for (int j=0; j<N; j++) {
+						int cnt = homeCnt(i, j, dist);	// 집 갯수
+						
+						if (cnt*M - cost >= 0) {	// 손해 없음
+							answer = Math.max(answer, cnt);
+							flag = true;
+						}
+					}
 				}
+				if (flag)	break;
 			}
+			
 			sb.append("#").append(testCase).append(" ").append(answer).append("\n");
 		}
 		System.out.print(sb.toString());
 	}
 	
-	static void bfs(int startX, int startY) {
-		Queue<Node> q = new ArrayDeque<>();
-		q.add(new Node(startX, startY));
-		visit[startX][startY] = true;
-		
-		int K = 1;	// 운영 영역의 크기, 1부터 시작 (점점 늘리기)
-		int cnt = 0;	// 포함된 집 갯수
-		
-		while(!q.isEmpty()) {
-			int size = q.size();
-			
-			for (int i=0; i<size; i++) {
-				Node cur = q.poll();
+	static int homeCnt(int x, int y, int dist) {
+		int count = 0;
+		for (int i = x-dist; i <= x+dist; i++) {
+			for (int j = y-dist; j <= y+dist; j++) {
 				
-				if (map[cur.x][cur.y] == 1)	cnt++;
+				if (!inRange(i, j))	continue;
+				if (!isMRM(i, j, x, y, dist))	continue;
 				
-				for (int d=0; d<4; d++) {
-					int nx = cur.x + dx[d];
-					int ny = cur.y + dy[d];
-					
-					if (!inRange(nx, ny))	continue;
-					if (visit[nx][ny])	continue;
-					
-					q.add(new Node(nx, ny));
-					visit[nx][ny] = true;
-				}
+				if (map[i][j] == 1)	count++;
 			}
-			
-			int cost = cnt*M - (K*K + (K-1)*(K-1));
-			if (cost >= 0) {
-				answer = Math.max(answer, cnt);
-			}
-			
-			K++;
 		}
+		
+		return count;
+	}
+	
+	static boolean isMRM(int i, int j, int x, int y, int dist) {
+		return Math.abs(i-x) + Math.abs(j-y) <= dist;
 	}
 	
 	static boolean inRange(int x, int y) {
