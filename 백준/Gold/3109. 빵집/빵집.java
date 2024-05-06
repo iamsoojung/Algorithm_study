@@ -1,57 +1,61 @@
+
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.util.StringTokenizer;
 
 public class Main {
-	static BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
-	static BufferedWriter bw=new BufferedWriter(new OutputStreamWriter(System.out));
-
-	static int[] di= { -1, 0,1};
-	static int[] dj= { 1, 1, 1};
-	static int cnt;
-	static int R,C;
-	static String[][]map;
+	
+	static boolean flag;	// 파이프 잘 놓았는지 
+	static int R, C, answer=0;
+	static char[][] map;
+	static boolean[][] visit;
+	static int[] dx = {-1, 0, 1};	// 그리디........
+	static int[] dy = {1, 1, 1};
 	
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-		String[] in1=br.readLine().split(" ");
-		R=Integer.parseInt(in1[0]);
-		C=Integer.parseInt(in1[1]);
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = null;
 		
-		map=new String[R][C];
-		for(int i=0;i<R;i++) {
-			String[] in2=br.readLine().split("");
-			for(int j=0;j<C;j++) {
-				map[i][j]=in2[j];
-			}
+		st = new StringTokenizer(br.readLine());
+		R = Integer.parseInt(st.nextToken());
+		C = Integer.parseInt(st.nextToken());
+		
+		map = new char[R][C];
+		for (int i=0; i<R; i++) {
+			map[i] = br.readLine().toCharArray();
 		}
 		
-		
-		cnt=0;
-		for(int i=0;i<R;i++) {
-			dfs(i,0);
+		for (int i=0; i<R; i++) {
+			flag = false;
+			dfs(i, 0);
 		}
-		
-		System.out.println(cnt);
-		
-	}//end main
-	
-	static boolean dfs(int i, int j) {
-		if(j==C-1) {
-			cnt++;
-			return true;
-		}
-		for(int d=0;d<3;d++) {
-			int ni=i+di[d];
-			int nj=j+dj[d];
-			if(ni>=0 && nj>=0 && ni<R && nj<C && map[ni][nj].equals(".")) {
-				map[ni][nj]="X";
-				if(dfs(ni,nj)) {return true;}
-			}
-		}
-		return false;
+		System.out.print(answer);
 	}
 	
+	static void dfs(int x, int y) {
+		if (y == C-1) {
+			flag = true;
+			answer++;
+			return;
+		}
+		
+		for (int d=0; d<3; d++) {
+			int nx = x + dx[d];
+			int ny = y + dy[d];
+			
+			if (!inRange(nx, ny))	continue;
+			if (map[nx][ny] != '.')	continue;
+			
+			map[nx][ny] = '-';	// 파이프 놓기
+			dfs(nx, ny);
+			
+			if (flag)	return;		// 벌써 파이프 놓는 방법을 찾았다면, 더 볼 필요 X
+		}
+	}
+	
+	static boolean inRange(int x, int y) {
+		return 0<=x && x<R && 0<=y && y<C;
+	}
 }
