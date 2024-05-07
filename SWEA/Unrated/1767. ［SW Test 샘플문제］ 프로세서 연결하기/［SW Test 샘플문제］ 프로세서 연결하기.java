@@ -57,6 +57,9 @@ public class Solution {
 	
 	static void dfs(int idx, int coreCnt, int wireLength) {
 		
+		// 코어 갯수가 더 커질 수 없다면
+		if (size - idx + coreCnt < maxCoreCnt)	return;
+		
 		if (idx == size) {
 			if (maxCoreCnt < coreCnt) {
 				maxCoreCnt = coreCnt;
