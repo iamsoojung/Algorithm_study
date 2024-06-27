@@ -15,7 +15,7 @@ public class Solution {
 			int N = Integer.parseInt(st.nextToken());
 			int M = Integer.parseInt(st.nextToken());
 			
-			int lastNBit = (1<<N) - 1;	// 마지막 N 비트 모두 1인 수
+			int lastNBit = (1<<N) - 1;	// 마지막 N 비트 모두 1인 수 (N 범위가 30 미만이므로 int)
 			if (lastNBit == (lastNBit & M)) {
 				sb.append("#").append(testCase).append(" ON\n");
 			} else {
