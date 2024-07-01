@@ -10,7 +10,6 @@ class Main {
 		int num, gold, silver, bronze, rank;
 		
 		public Medal(int num, int gold, int silver, int bronze, int rank) {
-			super();
 			this.num = num;
 			this.gold = gold;
 			this.silver = silver;
@@ -20,14 +19,24 @@ class Main {
 		
 		@Override
 		public int compareTo(Medal o) {
-			if (this.gold != o.gold) {
-				return o.gold - this.gold;
-			} else if (this.silver != o.silver) {
-				return o.silver - this.silver;
+			if (o.gold == this.gold) {
+				if (o.silver == this.silver) {
+					return o.bronze - this.bronze;
+				} else {
+					return o.silver - this.silver;
+				}
 			} else {
-				return o.bronze - this.bronze;
+				return o.gold - this.gold;
 			}
 		}
+
+		@Override
+		public String toString() {
+			return "Medal [num=" + num + ", gold=" + gold + ", silver=" + silver + ", bronze=" + bronze + ", rank="
+					+ rank + "]";
+		}
+		
+		
 	}
 	
 	static int N, K, answer = 0;
@@ -59,7 +68,6 @@ class Main {
 			
 			if (now.num == K) {
 				answer = i;		// 등수
-				break;
 			}
 			
 			if (now.gold == before.gold 
@@ -70,6 +78,6 @@ class Main {
 				now.rank = i+1;
 			}
 		}
-		System.out.println(answer);
+		System.out.println(medalList.get(answer).rank);
 	}
 }
