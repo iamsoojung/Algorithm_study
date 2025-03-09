@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 public class Main {
 	
@@ -10,7 +10,7 @@ public class Main {
 		int N = Integer.parseInt(br.readLine());
 		String s = br.readLine();
 		
-		Stack<Integer> stack = new Stack<>();
+		ArrayDeque<Integer> stack = new ArrayDeque<>();
 		int answer = 0;
 		
 		for (int i=0; i<N; i++) {
